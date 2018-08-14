@@ -18,36 +18,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-import time
-
-# import Adafruit_GPIO.SPI as SPI
-import Adafruit_SSD1306
-
+from time import sleep
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+# import Adafruit_GPIO.SPI as SPI
+import Adafruit_SSD1306
 
-import subprocess
 
 # Raspberry Pi pin configuration:
-RST = None     # on the PiOLED this pin isnt used
-# Note the following are only used with SPI:
-# DC = 23
-# SPI_PORT = 0
-# SPI_DEVICE = 0
-
-# Beaglebone Black pin configuration:
-# RST = 'P9_12'
-# Note the following are only used with SPI:
-# DC = 'P9_15'
-# SPI_PORT = 1
-# SPI_DEVICE = 0
-
-# 128x32 display with hardware I2C:
-# disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST)
+RST = None  # on the PiOLED this pin isnt used
 
 # 128x64 display with hardware I2C:
-disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
+DISP = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
 
 # Note you can change the I2C address by passing an i2c_address parameter like:
 # disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST, i2c_address=0x3C)
@@ -68,51 +51,57 @@ disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
 # disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST, dc=DC, sclk=18, din=25, cs=22)
 
 # Initialize library.
-disp.begin()
+DISP.begin()
 
 # Clear display.
-disp.clear()
-disp.display()
+DISP.clear()
+DISP.display()
 
 # Create blank image for drawing.
 # Make sure to create image with mode '1' for 1-bit color.
-width = disp.width
-height = disp.height
+W = DISP.width
+H = DISP.height
 
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
-padding = -2
-top = padding
-bottom = height-padding
+PADDING = 0
+TOP = PADDING
+BOTTOM = H - PADDING
 # Move left to right keeping track of the current x position for drawing shapes.
 x = 2
 
+FONT = ImageFont.truetype('resources/fonts/YanoneKaffeesatz-Regular.ttf', 24)
+FONT_BOLD = ImageFont.truetype('resources/fonts/YanoneKaffeesatz-Bold.ttf', 30)
 
-# Load default font.
-# font = ImageFont.load_default()
 
-# Alternatively load a TTF font.  Make sure the .ttf font file is in the same directory as the python script!
-# Some other nice fonts to try: http://www.dafont.com/bitmap.php
-font = ImageFont.truetype('YanoneKaffeesatz-Regular.ttf', 24)
-fontbig = ImageFont.truetype('YanoneKaffeesatz-Bold.ttf', 30)
+def intro():
+    with Image.open('resources/gfx/ProVeg_Badge_i.png').convert('1') as img:
+        display(img)
 
-while True:
-    image = Image.open('ProVeg_Badge_i.png').convert('1')
-    disp.image(image)
-    disp.display()
-    time.sleep(1)
+
+def print_balance(name, balance):
     # Draw a black filled box to clear the image.
-    image = Image.new('1', (width, height))
-    draw = ImageDraw.Draw(image)
-    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    img = Image.new('1', (W, H))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, W, H), outline=0, fill=0)
 
-    # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    draw.text((x, TOP), name, font=FONT, fill=255)
+    draw.text((x, TOP + 30), "Saldo:", font=FONT, fill=255)
+    draw.text((x + 50, TOP + 24), "{} €".format(balance), font=FONT_BOLD, fill=255)
+    display(img)
 
-    draw.text((x, top),       "Magdalena Schmittlein",  font=font, fill=255)
-    draw.text((x, top+30),  "Saldo:", font=font, fill=255)
-    draw.text((x+50, top+24),    "19,50 €",  font=fontbig, fill=255)
 
-    # Display image.
-    disp.image(image)
-    disp.display()
-    time.sleep(1)
+def display(img):
+    DISP.image(img)
+    DISP.display()
+
+
+def main():
+    while True:
+        intro()
+        sleep(1)
+        print_balance('Salomon Popp', 19.5)
+        sleep(1)
+
+
+main()
