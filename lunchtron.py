@@ -75,7 +75,7 @@ FONT_BOLD = ImageFont.truetype('resources/fonts/YanoneKaffeesatz-Bold.ttf', 30)
 
 
 def intro():
-    with Image.open('resources/gfx/ProVeg_Badge_i.png').convert('1') as img:
+    with Image.open('resources/img/ProVeg_Badge_i.png').convert('1') as img:
         display(img)
 
 
