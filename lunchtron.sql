@@ -12,29 +12,29 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `password_hash` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `balance_change` (
-  `uid` int(10) unsigned NOT NULL,
+CREATE TABLE `balance_change` (
+  `user_uid` int(5) unsigned NOT NULL,
   `by_who` int(10) unsigned NOT NULL,
-  `when` datetime NOT NULL,
+  `when` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `cards` (
-  `card_uid` int(11) NOT NULL,
-  `uid` int(10) unsigned NOT NULL
+CREATE TABLE `cards` (
+  `card_uid` varchar(8) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `user_uid` int(5) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `checkins` (
-  `uid` int(10) unsigned NOT NULL,
-  `when` datetime DEFAULT NULL
+CREATE TABLE `checkins` (
+  `user_uid` int(5) unsigned NOT NULL,
+  `when` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `uid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `users` (
+  `user_uid` int(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `price` decimal(10,2) NOT NULL DEFAULT '1.00',
-  `balance` decimal(10,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`uid`)
+  `price` decimal(6,2) NOT NULL DEFAULT '1.00',
+  `balance` decimal(6,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`user_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
