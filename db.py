@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 """Database."""
 import logging
 from pprint import pprint
@@ -53,13 +54,13 @@ def add_card(user_uid, card_uid):
 
     Arguments:
         user_uid {int} -- user identifier
-        card_uid {hex} -- card identifier
+        card_uid {str} -- card identifier
     """
     with connection.cursor() as cursor:
         # Create a new record
-        sql = "INSERT INTO `cards` (`card_uid`, `uid`) VALUES (%s, %s)"
+        sql = "INSERT INTO `cards` (`card_uid`, `user_uid`) VALUES (%s, %s)"
         _LOGGER.info('adding card %s for user %s', card_uid, user_uid)
-        cursor.execute(sql, (int(card_uid, base=16), int(user_uid)))
+        cursor.execute(sql, (card_uid, int(user_uid)))
         connection.commit()
 
 
@@ -71,9 +72,9 @@ def add_checkin(user_uid):
     """
     with connection.cursor() as cursor:
         # Create a new record
-        sql = "INSERT INTO `checkins` (`uid`) VALUES (%s)"
+        sql = "INSERT INTO `checkins` (`user_uid`) VALUES (%s)"
         _LOGGER.info('registering new checkin for user %s', user_uid)
-        cursor.execute(sql, int(user_uid))
+        cursor.execute(sql, user_uid)
         connection.commit()
 
 
@@ -89,13 +90,35 @@ def query_user(name):
 
 def query_users():
     _LOGGER.info('Querying all user data')
-    with connection.cursor() as cursor:
+    with connection.cursor() as cur:
         # Read all records
         sql = "SELECT * FROM `users`"
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        pprint(result)
-        return result
+        cur.execute(sql)
+        rv = cur.fetchall()
+        pprint(rv)
+        return rv
+
+
+def query_checkins():
+    _LOGGER.info('Querying all checkin data')
+    with connection.cursor() as cur:
+        # Read all records
+        sql = "SELECT * FROM `checkins`"
+        cur.execute(sql)
+        rv = cur.fetchall()
+        pprint(rv)
+        return rv
+
+
+def query_cards():
+    _LOGGER.info('Querying all cards data')
+    with connection.cursor() as cur:
+        # Read all records
+        sql = "SELECT * FROM `cards`"
+        cur.execute(sql)
+        rv = cur.fetchall()
+        pprint(rv)
+        return rv
 
 
 if __name__ == "__main__":
