@@ -1,6 +1,9 @@
+import logging
 from pprint import pprint
+
 import xmltodict
 
+_LOGGER = logging.getLogger(__name__)
 XML_PATH = 'resources/keycards.xml'
 
 
