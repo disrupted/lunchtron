@@ -9,7 +9,7 @@ USE `lunchtron`;
 
 CREATE TABLE IF NOT EXISTS `admins` (
   `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `password_hash` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+  `password_hash` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `balance_change` (
