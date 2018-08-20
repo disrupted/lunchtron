@@ -5,17 +5,18 @@ import db
 from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint, doc='/documentation')  # doc=False
+app.register_blueprint(blueprint)
 auth = HTTPBasicAuth()
 
 
 @auth.verify_password
 def verify_password(username, password_candidate):
+    """Verify basic auth credentials."""
     return db.verify_login(username, password_candidate)
 
-
-app.register_blueprint(blueprint)
 
 api.namespaces.clear()  # get rid of default namespace
 api_users = api.namespace('users', description='USER operations')
