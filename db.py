@@ -141,8 +141,8 @@ def get_password_hash(username):
             sql = "SELECT password_hash FROM `admins` WHERE `username`=%s"
             cur.execute(sql, username)
             return cur.fetchone()['password_hash']
-    except TypeError as e:
-        _LOGGER.error('No admin %s found', username)
+    except TypeError:
+        _LOGGER.error('No password_hash found for admin %s', username)
 
 
 def verify_login(username, password_candidate):
