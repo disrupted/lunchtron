@@ -48,16 +48,18 @@ class Users(Resource):
     @api_users.doc('query all user data')
     @api_users.marshal_with(users)
     def get(self, **kwargs):
-        return db.query_users()
+        return db.query_users(), 200
 
 
 @api_checkins.route('/')
 class Checkins(Resource):
     """Checkins."""
 
-    @api_checkins.marshal_with(checkins, code=201)
+    @auth.login_required
+    @api_users.doc('query all checkin data')
+    @api_checkins.marshal_with(checkins)
     def get(self, **kwargs):
-        return db.query_checkins(), 201
+        return db.query_checkins(), 200
 
     @api_checkins.doc('create_checkin')
     @api_checkins.expect(fields=checkins, code=201)
@@ -73,9 +75,11 @@ class Checkins(Resource):
 class Cards(Resource):
     """Cards."""
 
+    @auth.login_required
+    @api_users.doc('query all user data')
     @api_cards.marshal_with(cards)
     def get(self, **kwargs):
-        return db.query_cards()
+        return db.query_cards(), 200
 
 
 if __name__ == "__main__":
