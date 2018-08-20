@@ -138,7 +138,7 @@ def get_password_hash(username):
     _LOGGER.info('Querying password hash for admin %s', username)
     try:
         with conn.cursor() as cur:
-            sql = "SELECT password_hash FROM `admins` WHERE `username`=%s"
+            sql = "SELECT `password_hash` FROM `admins` WHERE `username`=%s"
             cur.execute(sql, username)
             return cur.fetchone()['password_hash']
     except TypeError:
