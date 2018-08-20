@@ -17,6 +17,7 @@ def verify_password(username, password_candidate):
 
 app.register_blueprint(blueprint)
 
+api.namespaces.clear()  # get rid of default namespace
 api_users = api.namespace('users', description='USER operations')
 api_checkins = api.namespace('checkins', description='CHECKIN operations')
 api_cards = api.namespace('cards', description='CARD operations')
