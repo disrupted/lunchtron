@@ -145,5 +145,16 @@ def get_password_hash(username):
         _LOGGER.error('No admin %s found', username)
 
 
+def verify_login(username, password_candidate):
+    _LOGGER.debug('Login attempt – username: %s, password candidate: %s',
+                  username, password_candidate)
+    if username and password_candidate:
+        password_hash = get_password_hash(username)
+        if password_hash:
+            return sha256_crypt.verify(password_candidate, password_hash)
+    _LOGGER.warning('AUTHENTICATION FAILED')
+    return False
+
+
 if __name__ == "__main__":
     query_users()
