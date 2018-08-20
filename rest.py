@@ -2,10 +2,22 @@ from flask import Flask, Blueprint, request
 from flask_restplus import Api, Resource, fields
 
 import db
+from passlib.hash import sha256_crypt
+from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint, doc='/documentation')  # doc=False
+auth = HTTPBasicAuth()
+
+
+@auth.verify_password
+def verify_password(username, password_candidate):
+    if username and password_candidate:
+        password_hash = db.get_password_hash(username)
+        if password_hash:
+            return sha256_crypt.verify(password_candidate, password_hash)
+    return False
 
 
 app.register_blueprint(blueprint)
@@ -36,6 +48,7 @@ cards = api.model('Model', {
 class Users(Resource):
     """Users."""
 
+    @auth.login_required
     @api_users.doc('query all user data')
     @api_users.marshal_with(users)
     def get(self, **kwargs):
