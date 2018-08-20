@@ -1,14 +1,18 @@
-from flask import Flask, request
+from flask import Flask, Blueprint, request
 from flask_restplus import Api, Resource, fields
 
 import db
 
 app = Flask(__name__)
-api = Api(app)
+blueprint = Blueprint('api', __name__, url_prefix='/api')
+api = Api(blueprint, doc='/documentation')  # doc=False
 
-ns_users = api.namespace('users', description='USER operations')
-ns_checkins = api.namespace('checkins', description='CHECKIN operations')
-ns_cards = api.namespace('cards', description='CARD operations')
+
+app.register_blueprint(blueprint)
+
+api_users = api.namespace('users', description='USER operations')
+api_checkins = api.namespace('checkins', description='CHECKIN operations')
+api_cards = api.namespace('cards', description='CARD operations')
 
 users = api.model('Model', {
     'user_uid': fields.Integer,
@@ -28,24 +32,26 @@ cards = api.model('Model', {
 })
 
 
-@ns_users.route('/')
+@api_users.route('/')
 class Users(Resource):
     """Users."""
 
-    @ns_users.marshal_with(users)
+    @api_users.doc('query all user data')
+    @api_users.marshal_with(users)
     def get(self, **kwargs):
         return db.query_users()
 
 
-@ns_checkins.route('/')
+@api_checkins.route('/')
 class Checkins(Resource):
     """Checkins."""
 
-    @ns_checkins.marshal_with(checkins)
+    @api_checkins.marshal_with(checkins, code=201)
     def get(self, **kwargs):
-        return db.query_checkins()
+        return db.query_checkins(), 201
 
-    @ns_checkins.expect(fields=checkins)
+    @api_checkins.doc('create_checkin')
+    @api_checkins.expect(fields=checkins, code=201)
     def post(self):
         json_data = request.get_json(force=True)
         print(json_data)
@@ -54,11 +60,11 @@ class Checkins(Resource):
         return {'result': 'Checkin added'}, 201
 
 
-@ns_cards.route('/')
+@api_cards.route('/')
 class Cards(Resource):
     """Cards."""
 
-    @ns_cards.marshal_with(cards)
+    @api_cards.marshal_with(cards)
     def get(self, **kwargs):
         return db.query_cards()
 
