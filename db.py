@@ -89,6 +89,10 @@ def add_checkin(user_uid):
         _LOGGER.info('registering new checkin for user %s', user_uid)
         cursor.execute(sql, user_uid)
         conn.commit()
+        checkin_uid = cursor.lastrowid
+        _LOGGER.debug('checkin created %d', checkin_uid)
+        print(checkin_uid)
+        return checkin_uid
 
 
 def query_user(name):

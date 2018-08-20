@@ -31,6 +31,7 @@ users = api.model('Model', {
 })
 
 checkins = api.model('Model', {
+    'checkin_uid': fields.Integer,
     'user_uid': fields.Integer,
     'when': fields.DateTime(dt_format='rfc822')
 })

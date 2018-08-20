@@ -25,8 +25,10 @@ CREATE TABLE `cards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `checkins` (
+  `checkin_uid` int(5) unsigned NOT NULL AUTO_INCREMENT,
   `user_uid` int(5) unsigned NOT NULL,
   `when` datetime DEFAULT CURRENT_TIMESTAMP
+  PRIMARY KEY (`checkin_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `users` (
