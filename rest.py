@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request
+from flask import Flask, Blueprint, request, render_template
 from flask_restplus import Api, Resource, fields
 
 import db
@@ -42,46 +42,90 @@ cards = api.model('Model', {
 })
 
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
 @api_users.route('/')
-class Users(Resource):
-    """Users."""
+class UserList(Resource):
+    """Shows a list of all users and lets you POST to add new users"""
 
     @auth.login_required
-    @api_users.doc('query all user data')
+    @api_users.doc('list_users')
     @api_users.marshal_with(users)
-    def get(self, **kwargs):
+    def get(self):
+        """List all users"""
         return db.query_users(), 200
 
 
+@api_users.route('/<int:id>')
+class User(Resource):
+    """Show a single user."""
+
+    @auth.login_required
+    @api_users.doc('get_user')
+    @api_users.marshal_with(users)
+    def get(self, id):
+        """List user by id"""
+        return db.query_user_by_id(id), 200
+
+
 @api_checkins.route('/')
-class Checkins(Resource):
+class CheckinList(Resource):
     """Checkins."""
 
     @auth.login_required
     @api_users.doc('query all checkin data')
     @api_checkins.marshal_with(checkins)
     def get(self, **kwargs):
+        """List all checkins"""
         return db.query_checkins(), 200
 
     @api_checkins.doc('create_checkin')
-    @api_checkins.expect(fields=checkins, code=201)
+    @api_checkins.expect(checkins)
+    # @api_checkins.marshal_with(checkins, code=201)
     def post(self):
-        json_data = request.get_json(force=True)
-        print(json_data)
-        user_uid = json_data['user_uid']
-        db.add_checkin(user_uid)
-        return {'result': 'Checkin added'}, 201
+        """Create new checkin"""
+        checkin_uid = db.create_checkin(api.payload['user_uid'])
+        return {'checkin_uid': checkin_uid, 'result': 'Checkin added'}, 201
+        # TODO return new checkin object, missing payload / argument
+
+
+@api_checkins.route('/<int:checkin_uid>')
+class Checkin(Resource):
+    """Show a single checkin."""
+
+    @auth.login_required
+    @api_checkins.doc('get_user_card')
+    @api_checkins.marshal_with(checkins)
+    def get(self, checkin_uid):
+        """Fetch chekin by id"""
+        return db.query_checkin_by_id(checkin_uid), 200
 
 
 @api_cards.route('/')
-class Cards(Resource):
+class CardList(Resource):
     """Cards."""
 
     @auth.login_required
-    @api_users.doc('query all user data')
+    @api_users.doc('query all card data')
     @api_cards.marshal_with(cards)
     def get(self, **kwargs):
+        """List all cards"""
         return db.query_cards(), 200
+
+
+@api_cards.route('/<card_uid>')
+class Card(Resource):
+    """Show a single card."""
+
+    @auth.login_required
+    @api_cards.doc('get_card_user')
+    @api_cards.marshal_with(cards)
+    def get(self, card_uid):
+        """Fetch card by card_uid"""
+        return db.query_card_by_id(card_uid), 200
 
 
 if __name__ == "__main__":

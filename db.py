@@ -77,7 +77,7 @@ def add_card(user_uid, card_uid):
         conn.commit()
 
 
-def add_checkin(user_uid):
+def create_checkin(user_uid):
     """Create a new Checkin record.
 
     Arguments:
@@ -95,11 +95,32 @@ def add_checkin(user_uid):
         return checkin_uid
 
 
+def update_balance(user_uid, balance_change):
+    balance_old = query_user_by_id(user_uid)['balance']
+    with conn.cursor() as cursor:
+        sql = "UPDATE `users` SET `balance`=`balance`+%s WHERE `user_uid`=%s"
+        _LOGGER.info('updating balance for user %s', user_uid)
+        cursor.execute(sql, (balance_change, user_uid))
+        conn.commit()
+        balance_new = query_user_by_id(user_uid)['balance']
+        _LOGGER.info('balance updated: {} -> {}'.format(balance_old, balance_new))
+
+
 def query_user(name):
     with conn.cursor() as cursor:
         # Read a single record
         sql = "SELECT * FROM `users` WHERE `name`=%s"
         cursor.execute(sql, name)
+        result = cursor.fetchone()
+        pprint(result)
+        return result
+
+
+def query_user_by_id(user_uid):
+    with conn.cursor() as cursor:
+        # Read a single record
+        sql = "SELECT * FROM `users` WHERE `user_uid`=%s"
+        cursor.execute(sql, user_uid)
         result = cursor.fetchone()
         pprint(result)
         return result
@@ -127,6 +148,16 @@ def query_checkins():
         return rv
 
 
+def query_checkin_by_id(checkin_uid):
+    _LOGGER.info('Querying checkin by id')
+    with conn.cursor() as cur:
+        sql = "SELECT * FROM `checkins` WHERE `checkin_uid`=%s"
+        cur.execute(sql, checkin_uid)
+        rv = cur.fetchone()
+        pprint(rv)
+        return rv
+
+
 def query_cards():
     _LOGGER.info('Querying all cards data')
     with conn.cursor() as cur:
@@ -134,6 +165,16 @@ def query_cards():
         sql = "SELECT * FROM `cards`"
         cur.execute(sql)
         rv = cur.fetchall()
+        pprint(rv)
+        return rv
+
+
+def query_card_by_id(card_uid):
+    _LOGGER.info('Querying card by id %s', card_uid)
+    with conn.cursor() as cur:
+        sql = "SELECT * FROM `cards` WHERE `card_uid`=%s"
+        cur.execute(sql, card_uid)
+        rv = cur.fetchone()
         pprint(rv)
         return rv
 
