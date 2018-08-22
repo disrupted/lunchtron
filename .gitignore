@@ -4,3 +4,5 @@ __pycache__
 *.icloud
 keycards.xml
 /credentials.cnf
+._*
+settings.py
