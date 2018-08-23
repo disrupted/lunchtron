@@ -77,7 +77,7 @@ class Checkin(Base):
 
     checkin_uid = Column(Integer, primary_key=True)
     user_uid = Column(Integer)
-    when = Column(DateTime, default=datetime.datetime.utcnow)
+    when = Column(DateTime, default=datetime.datetime.now)
 
     def __init__(self, user_uid=None, when=None):
         self.user_uid = user_uid,
