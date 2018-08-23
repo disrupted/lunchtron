@@ -93,6 +93,8 @@ class UserList(Resource):
 
 
 @api_users.route('/<int:id>')
+@api_users.response(404, 'User not found')
+@api_users.doc(params={'id': 'User ID'})
 class UserDetail(Resource):
     """Show a single user."""
 
@@ -102,6 +104,16 @@ class UserDetail(Resource):
     def get(self, id):
         """List user by id"""
         return db_session.query(User).filter_by(id=id).one(), 200
+
+    @auth.login_required
+    @api_users.expect(users)
+    @api_users.marshal_with(users)
+    def put(self, id):
+        """Update a user"""
+        db_session.query(User).filter_by(id=id).update(api.payload)
+        db_session.commit()
+        user = db_session.query(User).filter_by(id=id).one()
+        return user, 200
 
 
 @api_checkins.route('/')
@@ -117,21 +129,20 @@ class CheckinList(Resource):
 
     @api_checkins.doc('create_checkin')
     @api_checkins.expect(checkins)
-    # @api_checkins.marshal_with(checkins, code=201)
+    @api_checkins.response(201, 'Checkin created')
+    @api_checkins.marshal_with(checkins, code=201)
     def post(self):
         """Create new checkin"""
         user_uid = api.payload['user_uid']
-        print(user_uid)
-        new_checkin = Checkin(user_uid=user_uid)
-        db_session.add(new_checkin)
-        db_session.flush()
-        # return new_checkin.to_dict(), 201
-        return 201
-        # return {'checkin_uid': checkin_uid, 'result': 'Checkin added'}, 201
-        # TODO return new checkin object, missing payload / argument
+        checkin = Checkin(user_uid=user_uid)
+        db_session.add(checkin)
+        db_session.commit()
+        return checkin, 201
 
 
 @api_checkins.route('/<int:checkin_uid>')
+@api_checkins.response(404, 'Checkin not found')
+@api_checkins.doc(params={'checkin_uid': 'Checkin ID'})
 class CheckinDetail(Resource):
     """Show a single checkin."""
 
@@ -139,8 +150,17 @@ class CheckinDetail(Resource):
     @api_checkins.doc('checkin_detail')
     @api_checkins.marshal_with(checkins)
     def get(self, checkin_uid):
-        """Fetch chekin by id"""
+        """Fetch checkin by id"""
         return db_session.query(Checkin).filter_by(checkin_uid=checkin_uid).one(), 200
+
+    @auth.login_required
+    @api_checkins.doc('checkin_delete')
+    @api_checkins.response(204, 'Checkin deleted')
+    def delete(self, checkin_uid):
+        """Delete checkin"""
+        db_session.query(Checkin).filter(Checkin.checkin_uid == checkin_uid).delete()
+        db_session.flush()
+        return '', 204
 
 
 @api_cards.route('/')
@@ -156,6 +176,8 @@ class CardList(Resource):
 
 
 @api_cards.route('/<card_uid>')
+@api_cards.response(404, 'Card not found')
+@api_cards.doc(params={'card_uid': 'Card ID'})
 class CardDetail(Resource):
     """Show a single card."""
 
@@ -180,6 +202,8 @@ class AdminList(Resource):
 
 
 @api_admins.route('/<username>')
+@api_admins.response(404, 'Admin not found')
+@api_admins.doc(params={'username': 'Admin username'})
 class AdminDetail(Resource):
     """Show a single admin."""
 
