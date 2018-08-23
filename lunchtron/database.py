@@ -29,10 +29,10 @@ Base = declarative_base()
 
 def init_db():
     """Initialize our database."""
-    import lunchtron.models
+    # import lunchtron.models
     Base.metadata.create_all(engine)
 
-    from lunchtron.models import User
+    # from lunchtron.models import User
     # db_session.add_all([
     #     User(username='admin', password='fortinet'),
     #     User(username='test', password='fortinet')
