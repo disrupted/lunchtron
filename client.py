@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 _API_URL = 'http://10.1.128.140:5000/api'
 
 
-def get_user_uid(card_uid):
+def get_card(card_uid):
     # GET Card
     # GET /api/cards/<card_uid>
     try:
@@ -25,21 +25,22 @@ def get_user_uid(card_uid):
                 "Authorization": "Basic ZGlzcnVwdGVkOnNlY3JldA==",
             },
         )
-        print('Response HTTP Status Code: {status_code}'.format(
-            status_code=response.status_code))
-        print('Response HTTP Response Body: {content}'.format(
-            content=response.content))
-        try:
-            user_uid = response.json()['user_uid']
-            return user_uid
-        except KeyError as e:
-            _LOGGER.error(e)
+        # print('Response HTTP Status Code: {status_code}'.format(
+        #     status_code=response.status_code))
+        # print('Response HTTP Response Body: {content}'.format(
+        #     content=response.content))
+        user = response.json()
+        return user
+    except TypeError as e:
+        _LOGGER.error(e)
+    except KeyError as e:
+        _LOGGER.error(e)
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
 
 
 def get_user(user_uid):
-    """Retrieve User"""
+    """Retrieve User."""
     # GET /api/users/<user_uid>
     try:
         response = requests.get(
@@ -48,11 +49,15 @@ def get_user(user_uid):
                 "Authorization": "Basic ZGlzcnVwdGVkOnNlY3JldA==",
             },
         )
-        print('Response HTTP Status Code: {status_code}'.format(
-            status_code=response.status_code))
-        print('Response HTTP Response Body: {content}'.format(
-            content=response.content))
+        # print('Response HTTP Status Code: {status_code}'.format(
+        #     status_code=response.status_code))
+        # print('Response HTTP Response Body: {content}'.format(
+        #     content=response.content))
         return response.json()
+    except TypeError as e:
+        _LOGGER.error(e)
+    except KeyError as e:
+        _LOGGER.error(e)
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
 
@@ -70,37 +75,33 @@ def create_checkin(user_uid):
                 "user_uid": str(user_uid)
             })
         )
-        print('Response HTTP Status Code: {status_code}'.format(
-            status_code=response.status_code))
-        print('Response HTTP Response Body: {content}'.format(
-            content=response.content))
+        # print('Response HTTP Status Code: {status_code}'.format(
+        #     status_code=response.status_code))
+        # print('Response HTTP Response Body: {content}'.format(
+        #     content=response.content))
+        _LOGGER.info('Created checkin')
         return response.json()
+    except TypeError as e:
+        _LOGGER.error(e)
+    except KeyError as e:
+        _LOGGER.error(e)
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
 
 
-# while True:
-#     tag_id = reader.read_tag()
-#     user = parser.lookup_user(tag_id)
-
-#     if user:
-#         print('{} -> {} {}'.format(tag_id, user['u_fname'], user['u_lname']))
-#     else:
-#         print('User {} not found'.format(tag_id))
-
-#     sleep(3)
-
 while True:
+    print('Waiting for Card...')
     tag_id = reader.read_tag()
-    user_uid = get_user_uid(tag_id)
-    print(user_uid)
-    user = get_user(user_uid)
-    print(user)
+    card = get_card(tag_id)
+    if 'user_uid' in card:
+        user_uid = card['user_uid']
+        _LOGGER.info('User ID: %d', user_uid)
+        user = get_user(user_uid)
 
-    if user:
-        print('{} -> {} {}'.format(tag_id, user['name'], user['balance']))
-        create_checkin(user_uid)
+        _LOGGER.info('user for tag_id %s - %s', tag_id, user)
+        if user:
+            create_checkin(user['id'])
     else:
-        print('User {} not found'.format(tag_id))
+        _LOGGER.error('No user found for tag_id %s', tag_id)
 
-    sleep(3)
+    sleep(2)
