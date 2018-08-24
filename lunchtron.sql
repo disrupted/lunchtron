@@ -7,36 +7,35 @@
 CREATE DATABASE IF NOT EXISTS `lunchtron` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
 USE `lunchtron`;
 
-CREATE TABLE IF NOT EXISTS `admins` (
-  `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `password_hash` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-CREATE TABLE `balance_change` (
-  `user_uid` int(5) unsigned NOT NULL,
-  `by_who` int(10) unsigned NOT NULL,
-  `when` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `amount` decimal(10,2) NOT NULL
+CREATE TABLE `admins` (
+  `username` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `password_hash` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `cards` (
   `card_uid` varchar(8) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `user_uid` int(5) unsigned NOT NULL
+  `user_uid` int(5) unsigned NOT NULL,
+  PRIMARY KEY (`card_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `checkins` (
-  `checkin_uid` int(5) unsigned NOT NULL AUTO_INCREMENT,
+  `checkin_uid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_uid` int(5) unsigned NOT NULL,
-  `when` datetime DEFAULT CURRENT_TIMESTAMP
-  PRIMARY KEY (`checkin_uid`)
+  `when` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `amount` decimal(6,2) NOT NULL DEFAULT '0.00',
+  `initiator` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`checkin_uid`),
+  KEY `initiator` (`initiator`),
+  CONSTRAINT `checkins_ibfk_1` FOREIGN KEY (`initiator`) REFERENCES `admins` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `users` (
-  `user_uid` int(5) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `price` decimal(6,2) NOT NULL DEFAULT '1.00',
+  `price` decimal(6,2) unsigned NOT NULL DEFAULT '1.00',
   `balance` decimal(6,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`user_uid`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
