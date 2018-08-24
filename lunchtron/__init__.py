@@ -1,7 +1,7 @@
 """Lunchtron REST API."""
 import logging
 
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
 from flask_restplus import Api, Resource, fields
 
 from passlib.hash import sha256_crypt
@@ -57,7 +57,9 @@ users = api.model('Model', {
 checkins = api.model('Model', {
     'checkin_uid': fields.Integer,
     'user_uid': fields.Integer,
-    'when': fields.DateTime(dt_format='rfc822')
+    'when': fields.DateTime(dt_format='rfc822'),
+    'amount': fields.Fixed(description='fixed-precision decimal', decimals=2),
+    'initiator': fields.String
 })
 
 cards = api.model('Model', {
@@ -127,17 +129,19 @@ class CheckinList(Resource):
         """List all checkins"""
         return db_session.query(Checkin).all(), 200
 
+    @auth.login_required
     @api_checkins.doc('create_checkin')
     @api_checkins.expect(checkins)
     @api_checkins.response(201, 'Checkin created')
     @api_checkins.marshal_with(checkins, code=201)
     def post(self):
         """Create new checkin"""
+        auth = request.authorization
         user_uid = api.payload['user_uid']
-        checkin = Checkin(user_uid=user_uid)
+        checkin = Checkin(user_uid=user_uid, initiator=auth.username)
         db_session.add(checkin)
         db_session.commit()
-        return checkin, 201
+        return db_session.query(Checkin).order_by(Checkin.checkin_uid.desc()).first(), 201
 
 
 @api_checkins.route('/<int:checkin_uid>')

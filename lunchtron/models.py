@@ -31,8 +31,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100), unique=True)
-    price = Column(Numeric(6, 2))
-    balance = Column(Numeric(6, 2))
+    price = Column(Numeric(6, 2), default=1.00)
+    balance = Column(Numeric(6, 2), default=0.00)
 
     def __init__(self, name=None, price=None, balance=None):
         self.name = name
@@ -78,18 +78,24 @@ class Checkin(Base):
     checkin_uid = Column(Integer, primary_key=True)
     user_uid = Column(Integer)
     when = Column(DateTime, default=datetime.datetime.now)
+    amount = Column(Numeric(6, 2), default=0.00)
+    initiator = Column(String(50))
 
-    def __init__(self, user_uid=None, when=None):
-        self.user_uid = user_uid,
+    def __init__(self, user_uid=None, when=None, amount=None, initiator=None):
+        self.user_uid = user_uid
         self.when = when
+        self.amount = amount
+        self.initiator = initiator
 
     def __repr__(self):
-        return "<User(checkin_uid='%s', user_uid=%d, when='%s')>" % (
-            self.checkin_uid, self.user_uid, self.when)
+        return "<User(checkin_uid='%s', user_uid=%d, when='%s', amount=%d, initiator='%s')>" % (
+            self.checkin_uid, self.user_uid, self.when, self.amount, self.initiator)
 
     def to_dict(self):
         return {
             'checkin_uid': self.checkin_uid,
             'user_uid': self.user_uid,
-            'when': self.when
+            'when': self.when,
+            'amount': self.amount,
+            'initiator': self.initiator
         }
