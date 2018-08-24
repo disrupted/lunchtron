@@ -25,10 +25,8 @@ def get_card(card_uid):
                 "Authorization": "Basic ZGlzcnVwdGVkOnNlY3JldA==",
             },
         )
-        # print('Response HTTP Status Code: {status_code}'.format(
-        #     status_code=response.status_code))
-        # print('Response HTTP Response Body: {content}'.format(
-        #     content=response.content))
+        _LOGGER.debug('Response HTTP Status Code: %s', response.status_code)
+        _LOGGER.debug('Response HTTP Response Body: %s', response.content)
         user = response.json()
         return user
     except TypeError as e:
@@ -49,10 +47,8 @@ def get_user(user_uid):
                 "Authorization": "Basic ZGlzcnVwdGVkOnNlY3JldA==",
             },
         )
-        # print('Response HTTP Status Code: {status_code}'.format(
-        #     status_code=response.status_code))
-        # print('Response HTTP Response Body: {content}'.format(
-        #     content=response.content))
+        _LOGGER.debug('Response HTTP Status Code: %s', response.status_code)
+        _LOGGER.debug('Response HTTP Response Body: %s', response.content)
         return response.json()
     except TypeError as e:
         _LOGGER.error(e)
@@ -75,10 +71,8 @@ def create_checkin(user_uid):
                 "user_uid": str(user_uid)
             })
         )
-        # print('Response HTTP Status Code: {status_code}'.format(
-        #     status_code=response.status_code))
-        # print('Response HTTP Response Body: {content}'.format(
-        #     content=response.content))
+        _LOGGER.debug('Response HTTP Status Code: %s', response.status_code)
+        _LOGGER.debug('Response HTTP Response Body: %s', response.content)
         _LOGGER.info('Created checkin')
         return response.json()
     except TypeError as e:
